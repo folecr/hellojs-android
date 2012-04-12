@@ -1,4 +1,4 @@
-package org.cocos2dx.js;
+package spidermonkey;
 
 import android.content.res.AssetManager;
 import android.util.Log;
@@ -8,26 +8,20 @@ public class Bindings {
 
     public static StringBuilder getLibVersions() {
         StringBuilder content = new StringBuilder();
-        content.append("Hello Cocos, JS, Android!\n\n");
-        try {
-            content.append("Cocos2d Version = " + getCocosVersion() + "\n");
-        } catch (Throwable t) {
-            Log.d(LOGTAG, "Exception : " + t);
-            content.append("Error in Cocos2d.\n");
-        }
+        content.append("Hello JavaSscript, SpiderMonkey, Android!\n\n");
 
         try {
-            content.append("JS VM Version = " + getJSVMVersion() + "\n");
+            content.append("SpiderMonkey JavaScript VM Version = " + getJSVMVersion() + "\n");
         } catch (Throwable t) {
             Log.d(LOGTAG, "Exception : " + t);
-            content.append("Error in JavaScript VM.\n");
+            content.append("Error in SpiderMonkey JavaScript VM.\n");
         }
 
         try {
             content.append("Bindings Version = " + getBindingsVersion() + "\n");
         } catch (Throwable t) {
             Log.d(LOGTAG, "Exception : " + t);
-            content.append("Error in Cocos2d/JS Bindings.\n");
+            content.append("Error in SpiderMonkey JavaScript bindings.\n");
         }
 
         return content;
@@ -47,7 +41,4 @@ public class Bindings {
 
     private static native String getBindingsVersion();
     private static native void   bindingsDiagnostics();
-
-    private static native String getCocosVersion();
-    private static native void   cocosDiagnostics();
 }

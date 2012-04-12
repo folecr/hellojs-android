@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="org.cocos2dx.hellojs"
+      package="spidermonkey.hellojs"
       android:versionCode="1"
       android:versionName="1.0">
 
@@ -9,7 +9,7 @@
     <application android:label="@string/app_name"
                  android:icon="@drawable/icon">
 
-        <activity android:name=".HelloJS"
+        <activity android:name="com.example.spidermonkey.hellojs.HelloJS"
                   android:label="@string/app_name"
                   android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
                   android:configChanges="orientation">
@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".AssetsScripts"
+        <activity android:name="com.example.spidermonkey.hellojs.AssetsScripts"
                   android:label="@string/assets_js"
                   android:configChanges="orientation" />
     </application>

@@ -1,4 +1,4 @@
-package org.cocos2dx.hellojs;
+package com.example.spidermonkey.hellojs;
 
 import android.app.Activity;
 import android.content.res.AssetManager;
@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.cocos2dx.js.Bindings;
+import spidermonkey.Bindings;
 
 public class HelloJS extends Activity {
     static private final String LOGTAG = "HelloJS";
@@ -21,9 +21,10 @@ public class HelloJS extends Activity {
 
         Log.d(LOGTAG, "onCreate");
 
-        setContentView(R.layout.mainmenu);
+        setContentView(spidermonkey.hellojs.R.layout.mainmenu);
 
-        LinearLayout linearlayout = (LinearLayout) findViewById(R.id.text_content);
+        LinearLayout linearlayout =
+            (LinearLayout) findViewById(spidermonkey.hellojs.R.id.text_content);
 
         addVersionStringsToLinearLayout(linearlayout);
     }
