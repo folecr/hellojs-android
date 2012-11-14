@@ -17,4 +17,4 @@ LOCAL_LDLIBS += -llog
 include $(BUILD_SHARED_LIBRARY)
 
 $(call import-module,jsbindings)
-$(call import-module,spidermonkey/android)
+$(call import-module,spidermonkey)
