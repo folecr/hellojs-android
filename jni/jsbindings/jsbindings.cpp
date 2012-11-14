@@ -48,8 +48,6 @@ namespace jsbindings {
         LOGD("runJS");
         // LOGD("script :\n%s", script);
 
-        JS_SetCStringsAreUTF8();
-
         /* Create a JS runtime. */
         JSRuntime *rt = JS_NewRuntime(8L * 1024L * 1024L);
         if (rt == NULL) {
@@ -75,11 +73,8 @@ namespace jsbindings {
         JSObject* global = JS_NewGlobalObject(cx, &global_class, NULL);
         if (!global) {
             LOGD("(global == NULL)");
-            return NULL;
+            return 1;
         }
-
-        // whatsit?!!!
-        JSAutoCompartment ac(cx, global);
 
         // Populate the global object with the standard globals,
         // like Object and Array.
@@ -123,7 +118,7 @@ namespace jsbindings {
                 }
             }
         }
-  
+
         // Cleanup
         JS_DestroyContext(cx);
         JS_DestroyRuntime(rt);
