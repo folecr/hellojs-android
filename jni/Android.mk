@@ -13,6 +13,7 @@ LOCAL_WHOLE_STATIC_LIBRARIES += jsbindings
 
 LOCAL_LDLIBS := -landroid
 LOCAL_LDLIBS += -llog
+LOCAL_LDLIBS += -lz
 
 include $(BUILD_SHARED_LIBRARY)
 
