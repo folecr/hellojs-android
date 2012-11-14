@@ -18,4 +18,4 @@ LOCAL_LDLIBS += -llog
 
 include $(BUILD_STATIC_LIBRARY)
 
-$(call import-module,spidermonkey/android)
+$(call import-module,spidermonkey)

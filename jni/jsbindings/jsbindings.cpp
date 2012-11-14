@@ -16,6 +16,10 @@ namespace jsbindings {
         return VERSION.c_str();
     }
 
+   void finalize(JSFreeOp *freeOp, JSObject *obj) {
+        return;
+    }
+
     // The class of the global object.
     static JSClass global_class =
         {"global",
@@ -27,7 +31,7 @@ namespace jsbindings {
          JS_EnumerateStub,
          JS_ResolveStub,
          JS_ConvertStub,
-         JS_FinalizeStub,
+         finalize,
          JSCLASS_NO_OPTIONAL_MEMBERS};
 
     // The error reporter callback.
@@ -58,14 +62,16 @@ namespace jsbindings {
             return 1;
         }
 
-        JS_SetOptions(cx, JSOPTION_VAROBJFIX);
+        JS_SetOptions(cx, JSOPTION_TYPE_INFERENCE);
         JS_SetVersion(cx, JSVERSION_LATEST);
+        JS_SetOptions(cx, JS_GetOptions(cx) & ~JSOPTION_METHODJIT);
+        JS_SetOptions(cx, JS_GetOptions(cx) & ~JSOPTION_METHODJIT_ALWAYS);
+
         JS_SetErrorReporter(cx, jsbindings::reportError);
 
         /* Create the global object in a new compartment. */
-        JSObject *global =
-            JS_NewCompartmentAndGlobalObject(cx, &global_class, NULL);
-        if (global == NULL) {
+        JSObject* global = JS_NewGlobalObject(cx, &global_class, NULL);
+        if (!global) {
             LOGD("(global == NULL)");
             return 1;
         }
@@ -112,7 +118,7 @@ namespace jsbindings {
                 }
             }
         }
-  
+
         // Cleanup
         JS_DestroyContext(cx);
         JS_DestroyRuntime(rt);

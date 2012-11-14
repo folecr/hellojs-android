@@ -1,54 +1,100 @@
 # set params
-NDK_ROOT_LOCAL=/path/to/android/ndk
-MOZILLA_ROOT_LOCAL=/path/to/spidermonkey
-GAME_ROOT_LOCAL=/path/to/the/game/directory
+# NDK_ROOT_LOCAL=/path/to/android/ndk
+# MOZILLA_ROOT_LOCAL=/path/to/spidermonkey
+# GAME_ROOT_LOCAL=/path/to/the/game/directory
+
+APPNAME="jsplayer-android"
+
+# options
+
+debug=
+verbose=
 
 usage(){
 cat << EOF
 usage: $0 [options]
 
-Build C/C++ native code using Android NDK
+Build C/C++ code for $APPNAME using Android NDK
 
 OPTIONS:
-   -h	this help
+-d	Build in debug mode
+-v  Turn on verbose output
+-h	this help
+
+Dependencies :
+CLANG_ROOT
+NDK_ROOT
+
+Paths to sources (defaults are in ./submodules) :
+COCOS2DX_ROOT
+MOZILLA_ROOT
+
+Define this to run the build script from an external directory :
+APP_ROOT
+
 EOF
 }
 
-while getopts "s" OPTION; do
-	case "$OPTION" in
-		h)
-			usage
-			exit 0
-			;;
-	esac
+while getopts "dvh" OPTION; do
+case "$OPTION" in
+d)
+debug=1
+;;
+v)
+verbose=1
+;;
+h)
+usage
+exit 0
+;;
+esac
 done
 
-# try to get global variable
-if [ $NDK_ROOT"aaa" != "aaa" ]; then
-    NDK_ROOT_LOCAL=$NDK_ROOT
-    echo "use global definition of NDK_ROOT: $NDK_ROOT"
+# exit this script if any commmand fails
+set -e
+
+# paths
+
+if [ -z "${NDK_ROOT+aaa}" ]; then
+# ... if NDK_ROOT is not set, use "$HOME/bin/android-ndk"
+    NDK_ROOT="$HOME/bin/android-ndk"
 fi
 
-if [ $MOZILLA_ROOT"aaa" != "aaa" ]; then
-    MOZILLA_ROOT_LOCAL=$MOZILLA_ROOT
-    echo "use global definition of MOZILLA_ROOT: $MOZILLA_ROOT"
+# paths with defaults hardcoded to relative paths
+
+if [ -z "${APP_ROOT+aaa}" ]; then
+    APP_ROOT="$PWD"
 fi
 
-if [ $GAME_ROOT"aaa" != "aaa" ]; then
-    GAME_ROOT_LOCAL=$GAME_ROOT
-    echo "use global definition of GAME_ROOT: $GAME_ROOT_LOCAL"
-else
-# if GAME_ROOT is not set
-# use current directory
-    GAME_ROOT_LOCAL=$PWD
-    echo "using current directory for GAME_ROOT: $GAME_ROOT_LOCAL"
+if [ -z "${MOZILLA_ROOT+aaa}" ]; then
+    MOZILLA_ROOT="$PWD/submodules/mozilla-prebuilt"
 fi
 
-# Currently we only have the android game
-GAME_ANDROID_ROOT=$GAME_ROOT_LOCAL
+echo "NDK_ROOT: $NDK_ROOT"
+echo "APP_ROOT: $APP_ROOT"
+echo "MOZILLA_ROOT: $MOZILLA_ROOT"
+
+# Currently we only have the android app
+APP_ANDROID_ROOT="$APP_ROOT"
+
+DEBUG_OPTIONS=
+if [[ $debug ]]; then
+    DEBUG_OPTIONS="NDK_DEBUG=1"
+fi
+
+VERBOSE_OPTIONS=
+if [[ $verbose ]]; then
+    VERBOSE_OPTIONS="NDK_LOG=1 V=1"
+fi
+
+# Exit on error
+set -e
 
 # build
 echo "Building native code..."
-$NDK_ROOT_LOCAL/ndk-build -C $GAME_ANDROID_ROOT \
-    NDK_MODULE_PATH=${GAME_ANDROID_ROOT}/jni:${MOZILLA_ROOT_LOCAL}
+set -x
+$NDK_ROOT/ndk-build -C $APP_ANDROID_ROOT $DEBUG_OPTIONS $VERBOSE_OPTIONS\
+    NDK_MODULE_PATH=${APP_ANDROID_ROOT}/jni:${MOZILLA_ROOT}
+set +x
+
 echo "... Building native code : Done."
