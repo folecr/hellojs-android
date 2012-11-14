@@ -16,6 +16,10 @@ namespace jsbindings {
         return VERSION.c_str();
     }
 
+   void finalize(JSFreeOp *freeOp, JSObject *obj) {
+        return;
+    }
+
     // The class of the global object.
     static JSClass global_class =
         {"global",
@@ -27,7 +31,7 @@ namespace jsbindings {
          JS_EnumerateStub,
          JS_ResolveStub,
          JS_ConvertStub,
-         JS_FinalizeStub,
+         finalize,
          JSCLASS_NO_OPTIONAL_MEMBERS};
 
     // The error reporter callback.
@@ -63,12 +67,14 @@ namespace jsbindings {
         JS_SetErrorReporter(cx, jsbindings::reportError);
 
         /* Create the global object in a new compartment. */
-        JSObject *global =
-            JS_NewCompartmentAndGlobalObject(cx, &global_class, NULL);
-        if (global == NULL) {
+        JSObject* global = JS_NewGlobalObject(cx, &global_class, NULL);
+        if (!global) {
             LOGD("(global == NULL)");
-            return 1;
+            return NULL;
         }
+
+        // whatsit?!!!
+        JSAutoCompartment ac(cx, global);
 
         // Populate the global object with the standard globals,
         // like Object and Array.
