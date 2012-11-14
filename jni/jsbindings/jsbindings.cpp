@@ -48,6 +48,8 @@ namespace jsbindings {
         LOGD("runJS");
         // LOGD("script :\n%s", script);
 
+        JS_SetCStringsAreUTF8();
+
         /* Create a JS runtime. */
         JSRuntime *rt = JS_NewRuntime(8L * 1024L * 1024L);
         if (rt == NULL) {
@@ -62,8 +64,11 @@ namespace jsbindings {
             return 1;
         }
 
-        JS_SetOptions(cx, JSOPTION_VAROBJFIX);
+        JS_SetOptions(cx, JSOPTION_TYPE_INFERENCE);
         JS_SetVersion(cx, JSVERSION_LATEST);
+        JS_SetOptions(cx, JS_GetOptions(cx) & ~JSOPTION_METHODJIT);
+        JS_SetOptions(cx, JS_GetOptions(cx) & ~JSOPTION_METHODJIT_ALWAYS);
+
         JS_SetErrorReporter(cx, jsbindings::reportError);
 
         /* Create the global object in a new compartment. */
