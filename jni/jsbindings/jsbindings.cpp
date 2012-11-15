@@ -16,7 +16,7 @@ namespace jsbindings {
         return VERSION.c_str();
     }
 
-   void finalize(JSFreeOp *freeOp, JSObject *obj) {
+    void finalize(JSFreeOp *freeOp, JSObject *obj) {
         return;
     }
 
@@ -76,48 +76,55 @@ namespace jsbindings {
             return 1;
         }
 
-        // Populate the global object with the standard globals,
-        // like Object and Array.
-        if (!JS_InitStandardClasses(cx, global)) {
-            LOGD("(!JS_InitStandardClasses(cx, global))");
-            return 1;
-        }
+        {
+            // Enter the compartment of global... not strictly necessary
+            // ... but test it out anyway
+            JSAutoCompartment ac(cx, global);
 
-        const char *filename = NULL;
-        int lineno = 0;  
+            // Populate the global object with the standard globals,
+            // like Object and Array.
+            if (!JS_InitStandardClasses(cx, global)) {
+                LOGD("(!JS_InitStandardClasses(cx, global))");
+                return 1;
+            }
+
+            const char *filename = NULL;
+            int lineno = 0;  
   
-        jsval rval;
-        JSBool evaluatedOK = JS_EvaluateScript(cx, global,
-                                               script, strlen(script),  
-                                               filename, lineno, &rval);  
+            jsval rval;
+            JSBool evaluatedOK = JS_EvaluateScript(cx, global,
+                                                   script, strlen(script),  
+                                                   filename, lineno, &rval);  
 
-        if (JS_FALSE == evaluatedOK) {
-            LOGD("evaluatedOK == JS_FALSE)");
-            // return 1;
-        } else {
-            if (JSVAL_IS_NULL(rval)) {
-                LOGD("rval : (JSVAL_IS_NULL(rval)");
+            if (JS_FALSE == evaluatedOK) {
+                LOGD("evaluatedOK == JS_FALSE)");
                 // return 1;
-            } else if ((JSVAL_IS_BOOLEAN(rval)) &&
-                       (JS_FALSE == (JSVAL_TO_BOOLEAN(rval)))) {
-                LOGD("rval : (return value is JS_FALSE");
-                // return 1;
-            } else if (JSVAL_IS_STRING(rval)) {
-                JSString *str = JS_ValueToString(cx, rval);  
-                if (NULL == str) {
-                    LOGD("rval : return string is NULL");
-                } else {
-                    LOGD("rval : return string =\n%s\n", JS_EncodeString(cx, str));
-                }
-            } else if (JSVAL_IS_NUMBER(rval)) {
-                double number;
-                if (JS_FALSE == JS_ValueToNumber(cx, rval, &number)) {
-                    LOGD("rval : return number could not be converted");
-                } else {
-                    LOGD("rval : return number =\n%f", number);
+            } else {
+                if (JSVAL_IS_NULL(rval)) {
+                    LOGD("rval : (JSVAL_IS_NULL(rval)");
+                    // return 1;
+                } else if ((JSVAL_IS_BOOLEAN(rval)) &&
+                           (JS_FALSE == (JSVAL_TO_BOOLEAN(rval)))) {
+                    LOGD("rval : (return value is JS_FALSE");
+                    // return 1;
+                } else if (JSVAL_IS_STRING(rval)) {
+                    JSString *str = JS_ValueToString(cx, rval);  
+                    if (NULL == str) {
+                        LOGD("rval : return string is NULL");
+                    } else {
+                        LOGD("rval : return string =\n%s\n", JS_EncodeString(cx, str));
+                    }
+                } else if (JSVAL_IS_NUMBER(rval)) {
+                    double number;
+                    if (JS_FALSE == JS_ValueToNumber(cx, rval, &number)) {
+                        LOGD("rval : return number could not be converted");
+                    } else {
+                        LOGD("rval : return number =\n%f", number);
+                    }
                 }
             }
-        }
+
+        } // Leave the auto compartment
 
         // Cleanup
         JS_DestroyContext(cx);
